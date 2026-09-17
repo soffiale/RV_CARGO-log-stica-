@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>RV CARGO</title>
+    
+    <!-- ESTILOS VISUALES DEL SISTEMA -->
+    <style>
+        /* Estilos base para el fondo y la tipografía general */
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background-color: #f4f4f9; 
+            margin: 0; 
+        }
+        
+        /* Título principal centrado */
+        h1 { 
+            text-align: center; 
+            color: #333; 
+        }
+        
+        /* Contenedor azul que agrupa todos los botones de las pestañas */
+        .tabs { 
+            display: flex; 
+            justify-content: center; 
+            background: #007bff; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            margin-bottom: 25px; 
+        }
+
+        /* Estilo general de cada botón del menú */
+        .tab-button { 
+            background-color: inherit; 
+            border: none; 
+            outline: none; 
+            padding: 14px 20px; 
+            color: white; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold; 
+            transition: 0.3s; 
+        }
+
+        /* Efecto al pasar el cursor sobre un botón */
+        .tab-button:hover { 
+            background-color: #0056b3; 
+        }
+
+        /* Estilo del botón que está seleccionado actualmente */
+        .tab-button.active { 
+            background-color: #004085; 
+        }
+
+        /* Oculta las secciones de las pestañas por defecto */
+        .tab-content { 
+            display: none; 
+        }
+
+        /* Muestra la sección que tiene la clase 'active' */
+        .tab-content.active { 
+            display: block; 
+        }
+
+        /* Cajas blancas contenedoras para los formularios */
+        .form-box { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            max-width: 500px; 
+            margin: 0 auto 30px auto; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+
+        /* Separación de cada campo (label + input) */
+        .form-group { 
+            margin-bottom: 12px; 
+        }
+
+        /* Estilos para las etiquetas de los campos */
+        label { 
+            display: block; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+        }
+
+        /* Estilos para las cajas de entrada de texto/números */
+        input { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+
+        /* Botón verde de envío de formularios */
+        button[type="submit"] { 
+            background-color: #28a745; 
+            color: white; 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            width: 100%; 
+            font-weight: bold; 
+        }
+
+        /* Efecto hover en el botón de guardar/calcular */
+        button[type="submit"]:hover { 
+            background-color: #218838; 
+        }
+
+        /* Diseño de las tablas de datos */
+        table { 
+            width: 100%; 
+            max-width: 900px; 
+            border-collapse: collapse; 
+            background: white; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            margin: 0 auto; 
+        }
+
+        /* Celdas y encabezados de la tabla */
+        th, td { 
+            padding: 10px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd; 
+        }
+
+        /* Encabezado azul de las tablas */
+        th { 
+            background-color: #007bff; 
+            color: white; 
+        }
+    </style>
+</head>
+<body>
+
+    <h1>RV CARGO</h1>
+
+    <!-- BARRA DE NAVEGACIÓN: Botones para cambiar entre pestañas -->
+    <div class="tabs">
+        <button class="tab-button active" onclick="abrirPestana(event, 'clientes')">Clientes</button>
+        <button class="tab-button" onclick="abrirPestana(event, 'conductores')">Conductores</button>
+        <button class="tab-button" onclick="abrirPestana(event, 'costos')">Costos</button>
+        <button class="tab-button" onclick="abrirPestana(event, 'paquetes')">Paquetes</button>
+        <button class="tab-button" onclick="abrirPestana(event, 'vehiculos')">Vehículos</button>
+        <button class="tab-button" onclick="abrirPestana(event, 'cotizador')">Cotizador Express</button>
+    </div>
+
+    <!-- ==================== PESTAÑA: CLIENTES ==================== -->
+    <div id="clientes" class="tab-content active">
+        <div class="form-box">
+            <h2>Cargar Cliente</h2>
+            <form action="/nuevo_cliente" method="POST">
+                <div class="form-group"><label>Nombre:</label><input type="text" name="nombre" required></div>
+                <div class="form-group"><label>Apellido:</label><input type="text" name="apellido" required></div>
+                <div class="form-group"><label>DNI:</label><input type="text" name="dni" required></div>
+                <div class="form-group"><label>Edad:</label><input type="number" name="edad"></div>
+                <div class="form-group"><label>Palabra Clave:</label><input type="text" name="palabra_clave"></div>
+                <div class="form-group"><label>Dirección:</label><input type="text" name="direccion"></div>
+                <div class="form-group"><label>Localidad:</label><input type="text" name="localidad"></div>
+                <button type="submit">Guardar Cliente</button>
+            </form>
+        </div>
+
+        <table>
+            <thead><tr><th>Nombre</th><th>DNI</th><th>Edad</th><th>Palabra Clave</th><th>Dirección</th><th>Localidad</th></tr></thead>
+            <tbody>
+                {% for c in lista_clientes %}
+                    <tr><td><b>{{ c.nombre }} {{ c.apellido }}</b></td><td>{{ c.dni }}</td><td>{{ c.edad }}</td><td>{{ c.palabra_clave }}</td><td>{{ c.direccion }}</td><td>{{ c.localidad }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== PESTAÑA: CONDUCTORES ==================== -->
+    <div id="conductores" class="tab-content">
+        <div class="form-box">
+            <h2>Cargar Conductor</h2>
+            <form action="/nuevo_conductor" method="POST">
+                <div class="form-group"><label>Nombre:</label><input type="text" name="nombre" required></div>
+                <div class="form-group"><label>Apellido:</label><input type="text" name="apellido" required></div>
+                <div class="form-group"><label>DNI:</label><input type="text" name="dni" required></div>
+                <div class="form-group"><label>Licencia:</label><input type="text" name="licencia" required></div>
+                <div class="form-group"><label>Teléfono:</label><input type="text" name="telefono"></div>
+                <button type="submit">Guardar Conductor</button>
+            </form>
+        </div>
+        <table>
+            <thead><tr><th>Nombre</th><th>DNI</th><th>Licencia</th><th>Teléfono</th></tr></thead>
+            <tbody>
+                {% for cond in lista_conductores %}
+                    <tr><td><b>{{ cond.nombre }} {{ cond.apellido }}</b></td><td>{{ cond.dni }}</td><td>{{ cond.licencia }}</td><td>{{ cond.telefono }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== PESTAÑA: COSTOS ==================== -->
+    <div id="costos" class="tab-content">
+        <div class="form-box">
+            <h2>Cargar Costo</h2>
+            <form action="/nuevo_costo" method="POST">
+                <div class="form-group"><label>Concepto:</label><input type="text" name="concepto" required></div>
+                <div class="form-group"><label>Combustible ($):</label><input type="number" step="0.01" name="costo_combustible"></div>
+                <div class="form-group"><label>Peajes ($):</label><input type="number" step="0.01" name="peajes"></div>
+                <div class="form-group"><label>Mantenimiento ($):</label><input type="number" step="0.01" name="mantenimiento"></div>
+                <button type="submit">Guardar Costos</button>
+            </form>
+        </div>
+        <table>
+            <thead><tr><th>Concepto</th><th>Combustible</th><th>Peajes</th><th>Mantenimiento</th><th>Tarifa Base</th></tr></thead>
+            <tbody>
+                {% for cos in lista_costos %}
+                    <tr><td><b>{{ cos.concepto }}</b></td><td>${{ cos.costo_combustible }}</td><td>${{ cos.peajes }}</td><td>${{ cos.mantenimiento }}</td><td>${{ cos.tarifa_base }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== PESTAÑA: PAQUETES ==================== -->
+    <div id="paquetes" class="tab-content">
+        <div class="form-box">
+            <h2>Cargar Paquete</h2>
+            <form action="/nuevo_paquete" method="POST">
+                <div class="form-group"><label>Peso (kg):</label><input type="number" step="0.1" name="peso_kg"></div>
+                <div class="form-group"><label>Alto (cm):</label><input type="number" name="alto_cm"></div>
+                <div class="form-group"><label>Ancho (cm):</label><input type="number" name="ancho_cm"></div>
+                <div class="form-group"><label>Largo (cm):</label><input type="number" name="largo_cm"></div>
+                <div class="form-group"><label>Descripción:</label><input type="text" name="descripcion"></div>
+                <button type="submit">Guardar Paquete</button>
+            </form>
+        </div>
+        <table>
+            <thead><tr><th>Código</th><th>Peso</th><th>Dimensiones (A x An x L)</th><th>Descripción</th></tr></thead>
+            <tbody>
+                {% for p in lista_paquetes %}
+                    <tr><td><b>{{ p.codigo_seguimiento }}</b></td><td>{{ p.peso_kg }} kg</td><td>{{ p.alto_cm }}x{{ p.ancho_cm }}x{{ p.largo_cm }} cm</td><td>{{ p.descripcion }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== PESTAÑA: VEHÍCULOS ==================== -->
+    <div id="vehiculos" class="tab-content">
+        <div class="form-box">
+            <h2>Cargar Vehículo</h2>
+            <form action="/nuevo_vehiculo" method="POST">
+                <div class="form-group"><label>Patente:</label><input type="text" name="patente" required></div>
+                <div class="form-group"><label>Marca:</label><input type="text" name="marca"></div>
+                <div class="form-group"><label>Modelo:</label><input type="text" name="modelo"></div>
+                <div class="form-group"><label>Capacidad (kg):</label><input type="number" name="capacidad_carga_kg"></div>
+                <div class="form-group"><label>Tipo (Camión/Camioneta):</label><input type="text" name="tipo"></div>
+                <button type="submit">Guardar Vehículo</button>
+            </form>
+        </div>
+        <table>
+            <thead><tr><th>Patente</th><th>Marca/Modelo</th><th>Capacidad</th><th>Tipo</th></tr></thead>
+            <tbody>
+                {% for v in lista_vehiculos %}
+                    <tr><td><b>{{ v.patente }}</b></td><td>{{ v.marca }} {{ v.modelo }}</td><td>{{ v.capacidad_carga_kg }} kg</td><td>{{ v.tipo }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== PESTAÑA: COTIZADOR ==================== -->
+    <div id="cotizador" class="tab-content {% if cotizacion %}active{% endif %}">
+        <div class="form-box">
+            <h2>Cotizar Viaje en Tiempo Real</h2>
+            <form action="/calcular_presupuesto" method="POST">
+                <div class="form-group"><label>Origen:</label><input type="text" name="origen" placeholder="Ej: Av. Mayo 500" required></div>
+                <div class="form-group"><label>Destino:</label><input type="text" name="destino" placeholder="Ej: Pilar, Buenos Aires" required></div>
+                <div class="form-group"><label>Horas de Espera:</label><input type="number" step="0.5" name="horas_espera" value="0"></div>
+                <div class="form-group"><label>Paradas Adicionales:</label><input type="number" name="paradas" value="0"></div>
+                <button type="submit">Calcular Presupuesto</button>
+            </form>
+        </div>
+
+        <!-- Muestra la tarjeta del presupuesto solo si el servidor devolvió el objeto 'cotizacion' -->
+        {% if cotizacion %}
+        <div class="form-box" style="border: 2px solid #28a745;">
+            <h3>Resultado del Presupuesto N° {{ cotizacion.id }}</h3>
+            <p><b>Origen:</b> {{ cotizacion.origen }}</p>
+            <p><b>Destino:</b> {{ cotizacion.destino }}</p>
+            <p><b>Distancia calculada:</b> {{ cotizacion.distancia_km }} km</p>
+            <hr>
+            <p>Peajes: ${{ cotizacion.peajes }}</p>
+            <p>Horas de espera: {{ cotizacion.horas_espera }} hs</p>
+            <p>Paradas adicionales: {{ cotizacion.paradas }}</p>
+            <h2 style="color: #28a745;">TOTAL ESTIMADO: ${{ cotizacion.total }}</h2>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- SCRIPT (JAVASCRIPT) PARA LA LÓGICA DE INTERCAMBIO DE PESTAÑAS -->
+    <script>
+        function abrirPestana(evt, nombrePestana) {
+            var i, content, tablinks;
+            
+            // 1. Oculta todos los elementos con la clase 'tab-content'
+            content = document.getElementsByClassName("tab-content");
+            for (i = 0; i < content.length; i++) {
+                content[i].style.display = "none";
+                content[i].classList.remove("active");
+            }
+            
+            // 2. Remueve la clase 'active' de todos los botones de la barra
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            // 3. Muestra únicamente la pestaña seleccionada y resalta su botón
+            document.getElementById(nombrePestana).style.display = "block";
+            if (evt) {
+                evt.currentTarget.className += " active";
+            }
+        }
+    </script>
+
+</body>
+</html>
